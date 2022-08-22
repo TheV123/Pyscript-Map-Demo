@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+
+    <py-env>
+        - pandas
+        - folium
+    </py-env>
+    <title>Interactive Map in Py-Script</title>
+    <link href="images\python_icon.png" rel = "shortcut icon"/>
+
+</head>
+<body>
+    <div class="background" style="background-image: url('\images\\background.png');" >
+        <div class="title" style = "width: 50%; margin: 0 auto;">
+            <h1 style = "color:rgb(5, 15, 45); font-family:Verdana; text-align:center; font-size: 3em; box-shadow: rgb(5, 15, 45);">
+            Folium Map
+            <p style = "color: rgb(86, 85, 85); font-family:Helvetica; text-align:center; font-size: .75em">
+                This is a folium map of the Unemployment rates of each state
+            </p>
+            </h1>
+        </div>
+    </div>
+    <div id="map" style = "max-width: 60%; min-width: 30%; height: 40%; margin: 0 auto; border-radius: 100px;" ></div>
+    <footer style="height:auto; background-image: url('\images\\background.png');">
+        <h1 style="color:white; padding:40px; margin:0; text-align:center; font-size: 2em;">Made by Vishal Kamalakrishnan</h1>
+    </footer>
+    <py-script output = "map">
+import folium
+import pandas as pd
+import json
+
+from pyodide.http import open_url
+
+state_geo = "https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/us-states.json"
+state_unemployment="https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/US_Unemployment_Oct2012.csv"
+
+state_data = pd.read_csv(open_url(state_unemployment))
+geo_json = json.loads(open_url(state_geo).read())
+
+m = folium.Map(location=[48, -102], zoom_start=3, tiles="Stamen Terrain")
+
+
+folium.Choropleth(
+    geo_data=geo_json,
+    name="Unemployment 2012",
+    data=state_data,
+    columns=['State', 'Unemployment'],
+    key_on="feature.id",
+    fill_color='YlGn',
+    fill_opacity=0.7,
+    line_opacity=0.2,
+    legend_name="Unemployment Rate (%), 2012"
+    ).add_to(m)
+    
+folium.LayerControl().add_to(m)
+
+m
+    </py-script>
+</body>
+</html>
